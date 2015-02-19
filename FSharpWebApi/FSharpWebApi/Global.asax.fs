@@ -11,9 +11,11 @@ open System.Security.Claims
 open System.Threading.Tasks
 open Microsoft.Owin
 open Microsoft.Owin.Security
+open Microsoft.Owin.Security.OAuth
 open Microsoft.AspNet.Identity
 open Microsoft.AspNet.Identity.EntityFramework
 open Microsoft.AspNet.Identity.Owin
+open Newtonsoft.Json.Serialization
 
 type BundleConfig() =
   static member RegisterBundles (bundles:BundleCollection) =
@@ -46,6 +48,11 @@ type Global() =
     inherit System.Web.HttpApplication() 
 
     static member RegisterWebApi(config: HttpConfiguration) =
+        // Web API configuration and services
+        // Configure Web API to use only bearer token authentication.
+        config.SuppressDefaultHostAuthentication()
+        config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType))
+
         // Configure routing
         config.MapHttpAttributeRoutes()
         config.Routes.MapHttpRoute(
