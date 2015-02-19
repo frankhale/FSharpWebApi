@@ -1,1 +1,1 @@
-<%@ Application Inherits="FSharpWeb1.Global" %>
+<%@ Application Inherits="FSharpWebApi.Global" %>

@@ -1,4 +1,4 @@
-namespace FSharpWeb1
+namespace FSharpWebApi
 
 open System
 open System.Net.Http

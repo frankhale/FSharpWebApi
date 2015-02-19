@@ -114,6 +114,8 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="Content\Site.css" />
+	<Content Include="Content\Bootstrap.css" />
+	<Content Include="Content\Bootstrap.min.css" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -280,7 +282,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.fsproj">
+    <ProjectReference Include="..\Common\Common.fsproj">
       <Name>Common</Name>
       <Project>{fb697140-86ec-42c8-a751-40b710e3b3b0}</Project>
       <Private>True</Private>

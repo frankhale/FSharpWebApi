@@ -1,8 +1,8 @@
-module FSharpWeb1.AssemblyInfo
-open System.Reflection
-open Microsoft.Owin
+module FSharpWebApi.AssemblyInfo
 
-[<assembly: AssemblyTitle("FSharpWeb1")>]
+open System.Reflection
+
+[<assembly: AssemblyTitle("FSharpWebApi")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
@@ -18,4 +18,3 @@ open Microsoft.Owin
 //[<assembly: AssemblyKeyFile("")>]
 
 ()
-

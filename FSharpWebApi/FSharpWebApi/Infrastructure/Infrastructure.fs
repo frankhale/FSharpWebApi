@@ -11,8 +11,6 @@ open Microsoft.AspNet.Identity.Owin
 open System.Threading.Tasks
 open System.Web
 open System.Web.Mvc
-open Microsoft.AspNet.Identity.Owin
-open Microsoft.Owin.Security
 
 open Common.Helpers
 
@@ -30,7 +28,6 @@ module Helpers =
   let (?<-) (viewData:ViewDataDictionary) (name:string) (value:'T) =
     viewData.Add(name, box value)
 
-[<AllowNullLiteral>]
 type ApplicationUserManager(store:IUserStore<ApplicationUser>) =
   inherit UserManager<ApplicationUser>(store)
   
@@ -41,6 +38,8 @@ type ApplicationUserManager(store:IUserStore<ApplicationUser>) =
     let userValidator = UserValidator<ApplicationUser> (manager)
     userValidator.AllowOnlyAlphanumericUserNames <- false
     userValidator.RequireUniqueEmail <- true
+
+    manager.UserValidator <- userValidator
 
     // Configure validation logic for passwords
     let passwordValidator = PasswordValidator()

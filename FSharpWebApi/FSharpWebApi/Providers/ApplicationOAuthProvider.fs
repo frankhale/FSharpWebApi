@@ -13,6 +13,7 @@ open Microsoft.Owin.Security.Cookies
 open Microsoft.Owin.Security.OAuth
 
 open Common.Helpers
+
 open FSharpWebApi.Infrastructure
 open FSharpWebApi.Models
 
