@@ -41,7 +41,6 @@ type private ExternalLoginData() =
     with get() = _userName
     and set(value) = _userName <- value
 
-  //public IList<Claim> GetClaims()
   member this.GetClaims() =   
     let claims = new List<Claim>()    
     claims.Add(new Claim(ClaimTypes.NameIdentifier, this.ProviderKey, null, this.LoginProvider))
@@ -120,84 +119,51 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
     this.Ok()
 
   // GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
-//  [Route("ManageInfo")]
-//	public async Task<ManageInfoViewModel> GetManageInfo(string returnUrl, bool generateState = false)
-//	{
-//		IdentityUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+//  [<Route("ManageInfo")>]
+//  member this.GetManageInfo(returnUrl:string, generateState:bool) =
+//    let user = await(fun () -> this.UserManager.FindByIdAsync(this.User.Identity.GetUserId()))
 //
-//		if (user == null)
-//		{
-//			return null;
-//		}
+//    match user with
+//    | null -> None
+//    | _ ->
+//      let logins = new List<UserLoginInfoViewModel>()
+//      
+//      for linkedAccount in user.Logins do
+//        logins.Add({ LoginProvider = linkedAccount.LoginProvider; ProviderKey = linkedAccount.ProviderKey })
 //
-//		List<UserLoginInfoViewModel> logins = new List<UserLoginInfoViewModel>();
+//      if user.PasswordHash <> null then
+//        logins.Add({ LoginProvider = LocalLoginProvider; ProviderKey = user.UserName})
 //
-//		foreach (IdentityUserLogin linkedAccount in user.Logins)
-//		{
-//			logins.Add(new UserLoginInfoViewModel
-//			{
-//				LoginProvider = linkedAccount.LoginProvider,
-//				ProviderKey = linkedAccount.ProviderKey
-//			});
-//		}
-//
-//		if (user.PasswordHash != null)
-//		{
-//			logins.Add(new UserLoginInfoViewModel
-//			{
-//				LoginProvider = LocalLoginProvider,
-//				ProviderKey = user.UserName,
-//			});
-//		}
-//
-//		return new ManageInfoViewModel
-//		{
-//			LocalLoginProvider = LocalLoginProvider,
-//			Email = user.UserName,
-//			Logins = logins,
-//			ExternalLoginProviders = GetExternalLogins(returnUrl, generateState)
-//		};
-//	}
-//
-//	// POST api/Account/ChangePassword
-//	[Route("ChangePassword")]
-//	public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
-//	{
-//		if (!ModelState.IsValid)
-//		{
-//			return BadRequest(ModelState);
-//		}
-//
-//		IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
-//			model.NewPassword);
-//		
-//		if (!result.Succeeded)
-//		{
-//			return GetErrorResult(result);
-//		}
-//
-//		return Ok();
-//	}
-//
-//	// POST api/Account/SetPassword
-//	[Route("SetPassword")]
-//	public async Task<IHttpActionResult> SetPassword(SetPasswordBindingModel model)
-//	{
-//		if (!ModelState.IsValid)
-//		{
-//			return BadRequest(ModelState);
-//		}
-//
-//		IdentityResult result = await UserManager.AddPasswordAsync(User.Identity.GetUserId(), model.NewPassword);
-//
-//		if (!result.Succeeded)
-//		{
-//			return GetErrorResult(result);
-//		}
-//
-//		return Ok();
-//	}
-//
+//      Some({ LocalLoginProvider = LocalLoginProvider; 
+//        Email = user.Email; 
+//        Logins = logins; 
+//        ExternalLoginProviders = this.GetExternalLogins(returnUrl, generateState) })
+
+  // POST api/Account/ChangePassword
+  [<Route("ChangePassword")>]
+  //public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
+  member this.ChangePassword(model:ChangePasswordBindingModel) =
+    match this.ModelState.IsValid with
+    | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
+    | _ ->
+        let result = await(fun () -> this.UserManager.ChangePasswordAsync(this.User.Identity.GetUserId(), model.OldPassword, model.NewPassword))
+
+        match result.Succeeded with
+        | false -> this.GetErrorResult(result) :> IHttpActionResult
+        | _ -> this.Ok() :> IHttpActionResult
+
+  // POST api/Account/SetPassword
+  [<Route("SetPassword")>]
+  member this.SetPassword(model:SetPasswordBindingModel) =
+    match this.ModelState.IsValid with
+    | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
+    | _ -> 
+      let result = await(fun () -> this.UserManager.AddPasswordAsync(this.User.Identity.GetUserId(), model.NewPassword))
+      
+      match result.Succeeded with
+      | false -> this.GetErrorResult(result) :> IHttpActionResult
+      | _ -> this.Ok() :> IHttpActionResult
+
 //	// POST api/Account/AddExternalLogin
 //	[Route("AddExternalLogin")]
 //	public async Task<IHttpActionResult> AddExternalLogin(AddExternalLoginBindingModel model)
@@ -362,61 +328,45 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
 //
 //		return logins;
 //	}
-//
-//	// POST api/Account/Register
-//	[AllowAnonymous]
-//	[Route("Register")]
-//	public async Task<IHttpActionResult> Register(RegisterBindingModel model)
-//	{
-//		if (!ModelState.IsValid)
-//		{
-//			return BadRequest(ModelState);
-//		}
-//
-//		var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
-//
-//		IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-//
-//		if (!result.Succeeded)
-//		{
-//			return GetErrorResult(result);
-//		}
-//
-//		return Ok();
-//	}
-//
-//	// POST api/Account/RegisterExternal
-//	[OverrideAuthentication]
-//	[HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-//	[Route("RegisterExternal")]
-//	public async Task<IHttpActionResult> RegisterExternal(RegisterExternalBindingModel model)
-//	{
-//		if (!ModelState.IsValid)
-//		{
-//			return BadRequest(ModelState);
-//		}
-//
-//		var info = await Authentication.GetExternalLoginInfoAsync();
-//		if (info == null)
-//		{
-//			return InternalServerError();
-//		}
-//
-//		var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
-//
-//		IdentityResult result = await UserManager.CreateAsync(user);
-//		if (!result.Succeeded)
-//		{
-//			return GetErrorResult(result);
-//		}
-//
-//		result = await UserManager.AddLoginAsync(user.Id, info.Login);
-//		if (!result.Succeeded)
-//		{
-//			return GetErrorResult(result); 
-//		}
-//		return Ok();
-//	}
+
+  // POST api/Account/Register
+  [<AllowAnonymous>]
+  [<Route("Register")>]
+  member this.Register(model:RegisterBindingModel) =
+    match this.ModelState.IsValid with
+    | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
+    | true -> 
+      let user = new ApplicationUser(UserName = model.Email, Email = model.Email);   
+      let result = await(fun () -> this.UserManager.CreateAsync(user, model.Password))
+      
+      match result.Succeeded with
+      | false -> this.GetErrorResult(result) :> IHttpActionResult
+      | true -> this.Ok() :> IHttpActionResult
+
+  // POST api/Account/RegisterExternal
+  [<OverrideAuthentication>]
+  [<HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)>]
+  [<Route("RegisterExternal")>]
+  member this.RegisterExternal(model:RegisterExternalBindingModel) =
+    match this.ModelState.IsValid with
+    | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
+    | true ->
+        let info = await(fun () -> this.Authentication.GetExternalLoginInfoAsync())
+ 
+        match info with
+        | null -> this.InternalServerError() :> IHttpActionResult
+        | _ ->
+            let user = new ApplicationUser(UserName = model.Email, Email = model.Email)
+            let result = await(fun () -> this.UserManager.CreateAsync(user))
+            
+            match result.Succeeded with
+            | false -> this.GetErrorResult(result) :> IHttpActionResult
+            | _ ->
+                let result = await(fun () -> this.UserManager.AddLoginAsync(user.Id, info.Login))
+                
+                match result.Succeeded with
+                | false -> this.GetErrorResult(result) :> IHttpActionResult
+                | _ -> this.Ok() :> IHttpActionResult            
 
   override this.Dispose(disposing:bool) =
     if (disposing && _userManager <> null) then
@@ -425,32 +375,16 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
 
     base.Dispose(disposing)
 
+  member private this.GetErrorResult(result:IdentityResult) =
+    match result with
+    | null -> this.InternalServerError() :> IHttpActionResult
+    | _ ->
+        match result.Succeeded with
+        | true -> null
+        | false ->
+            if result.Errors <> null then
+              result.Errors |> Seq.iter(fun error -> this.ModelState.AddModelError("", error))
 
-//	private IHttpActionResult GetErrorResult(IdentityResult result)
-//	{
-//		if (result == null)
-//		{
-//			return InternalServerError();
-//		}
-//
-//		if (!result.Succeeded)
-//		{
-//			if (result.Errors != null)
-//			{
-//				foreach (string error in result.Errors)
-//				{
-//					ModelState.AddModelError("", error);
-//				}
-//			}
-//
-//			if (ModelState.IsValid)
-//			{
-//				// No ModelState errors are available to send, so just return an empty BadRequest.
-//				return BadRequest();
-//			}
-//
-//			return BadRequest(ModelState);
-//		}
-//
-//		return null;
-//	}
+            match this.ModelState.IsValid with
+            | true -> this.BadRequest() :> IHttpActionResult
+            | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
