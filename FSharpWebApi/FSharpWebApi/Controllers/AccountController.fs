@@ -23,7 +23,7 @@ open FSharpWebApi.Results
 
 open Common.Helpers
 
-type RouteValues =
+type private RouteValues =
   { Provider : string
     ResponseType : string
     ClientId : string
@@ -290,12 +290,12 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
     match this.ModelState.IsValid with
     | false -> this.BadRequest(this.ModelState) :> IHttpActionResult
     | true -> 
-      let user = new ApplicationUser(UserName = model.Email, Email = model.Email);   
-      let result = await(fun () -> this.UserManager.CreateAsync(user, model.Password))
+        let user = new ApplicationUser(UserName = model.Email, Email = model.Email);   
+        let result = await(fun () -> this.UserManager.CreateAsync(user, model.Password))
       
-      match result.Succeeded with
-      | false -> this.GetErrorResult(result) :> IHttpActionResult
-      | true -> this.Ok() :> IHttpActionResult
+        match result.Succeeded with
+        | false -> this.GetErrorResult(result) :> IHttpActionResult
+        | true -> this.Ok() :> IHttpActionResult
 
   // POST api/Account/RegisterExternal
   [<OverrideAuthentication>]
