@@ -17,7 +17,6 @@ open Common.Helpers
 open FSharpWebApi.Infrastructure
 open FSharpWebApi.Models
 
-//public class ApplicationOAuthProvider : OAuthAuthorizationServerProvider
 type ApplicationOAuthProvider(publicClientId : string) =
   inherit OAuthAuthorizationServerProvider()
 

@@ -28,6 +28,7 @@ module Helpers =
   let (?<-) (viewData:ViewDataDictionary) (name:string) (value:'T) =
     viewData.Add(name, box value)
 
+[<AllowNullLiteral>]
 type ApplicationUserManager(store:IUserStore<ApplicationUser>) =
   inherit UserManager<ApplicationUser>(store)
   

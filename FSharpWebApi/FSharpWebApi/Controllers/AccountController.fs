@@ -16,66 +16,106 @@ open Microsoft.Owin.Security
 open Microsoft.Owin.Security.Cookies
 open Microsoft.Owin.Security.OAuth
 
+open FSharpWebApi.Infrastructure
 open FSharpWebApi.Models
 open FSharpWebApi.Providers
 open FSharpWebApi.Results
 
 open Common.Helpers
 
-//[Authorize]
-//[RoutePrefix("api/Account")]
-//public class AccountController : ApiController
-//{
-//	private const string LocalLoginProvider = "Local";
-//	private ApplicationUserManager _userManager;
-//
-//	public AccountController()
-//	{
-//	}
-//
-//	public AccountController(ApplicationUserManager userManager,
-//		ISecureDataFormat<AuthenticationTicket> accessTokenFormat)
-//	{
-//		UserManager = userManager;
-//		AccessTokenFormat = accessTokenFormat;
-//	}
-//
-//	public ApplicationUserManager UserManager
-//	{
-//		get
-//		{
-//			return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
-//		}
-//		private set
-//		{
-//			_userManager = value;
-//		}
-//	}
-//
-//	public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
-//
-//	// GET api/Account/UserInfo
-//	[HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
-//	[Route("UserInfo")]
-//	public UserInfoViewModel GetUserInfo()
-//	{
-//		ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
-//
-//		return new UserInfoViewModel
-//		{
-//			Email = User.Identity.GetUserName(),
-//			HasRegistered = externalLogin == null,
-//			LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
-//		};
-//	}
-//
-//	// POST api/Account/Logout
-//	[Route("Logout")]
-//	public IHttpActionResult Logout()
-//	{
-//		Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType);
-//		return Ok();
-//	}
+[<AllowNullLiteral>]
+type private ExternalLoginData() =
+  let mutable _loginProvider = Unchecked.defaultof<string>
+  let mutable _providerKey = Unchecked.defaultof<string>
+  let mutable _userName = Unchecked.defaultof<string>
+
+  member this.LoginProvider
+    with get() = _loginProvider
+    and set(value) = _loginProvider <- value 
+  
+  member this.ProviderKey
+    with get() = _providerKey
+    and set(value) = _providerKey <- value
+
+  member this.UserName
+    with get() = _userName
+    and set(value) = _userName <- value
+
+  //public IList<Claim> GetClaims()
+  member this.GetClaims() =   
+    let claims = new List<Claim>()    
+    claims.Add(new Claim(ClaimTypes.NameIdentifier, this.ProviderKey, null, this.LoginProvider))
+  
+    if this.UserName <> null then
+      claims.Add(new Claim(ClaimTypes.Name, this.UserName, null, this.LoginProvider))
+
+    claims
+ 
+  static member FromIdentity(identity:ClaimsIdentity) =
+    match identity with
+    | null -> null
+    | _ -> 
+      let providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier)
+      match providerKeyClaim, String.IsNullOrEmpty(providerKeyClaim.Issuer), String.IsNullOrEmpty(providerKeyClaim.Value) with
+      | null, true, true -> null      
+      | _ -> match providerKeyClaim.Issuer with
+             | ClaimsIdentity.DefaultIssuer -> null
+             | _ -> new ExternalLoginData(LoginProvider = providerKeyClaim.Issuer, ProviderKey = providerKeyClaim.Value, UserName = identity.FindFirstValue(ClaimTypes.Name))
+
+type private RandomOAuthStateGenerator() =
+  static member private _random = 
+    new RNGCryptoServiceProvider()
+
+  static member Generate(strengthInBits:int) =
+    let bitsPerByte = 8
+
+    if (strengthInBits % bitsPerByte <> 0) then
+      raise(new ArgumentException("strengthInBits must be evenly divisible by 8.", "strengthInBits"))
+
+    let strengthInBytes = strengthInBits / bitsPerByte
+    let data : byte [] = Array.zeroCreate strengthInBytes
+    RandomOAuthStateGenerator._random.GetBytes(data);
+    HttpServerUtility.UrlTokenEncode(data)
+
+[<Authorize>]
+[<RoutePrefix("api/Account")>]
+type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISecureDataFormat<AuthenticationTicket>) =
+  inherit ApiController()
+
+  let LocalLoginProvider = "Local"
+  let mutable _accessTokenFormat = accessTokenFormat
+  let mutable _userManager = userManager
+
+  member this.UserManager
+    with get() = 
+      match _userManager with
+      | null -> this.Request.GetOwinContext().GetUserManager<ApplicationUserManager>()
+      | _ -> _userManager
+    and set(value) = _userManager <- value
+
+  member this.AccessTokenFormat
+    with get() = _accessTokenFormat
+    and set(value) = _accessTokenFormat <- value
+  
+  new() = new AccountController()
+
+  // GET api/Account/UserInfo
+  [<HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)>]
+  [<Route("UserInfo")>]
+  member this.GetUserInfo() =
+    let externalLogin = ExternalLoginData.FromIdentity(this.User.Identity :?> ClaimsIdentity)
+    let userInfoViewModel = { UserInfoViewModel.Email = this.User.Identity.GetUserName()
+                              HasRegistered = (externalLogin = null)
+                              LoginProvider = if externalLogin <> null then externalLogin.LoginProvider else null }
+  
+    userInfoViewModel
+
+  // POST api/Account/Logout
+//  [<Route("Logout")>]
+//  member this.Logout() =
+//    Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType)
+//    Ok()
+
 //
 //	// GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
 //	[Route("ManageInfo")]
@@ -423,74 +463,3 @@ open Common.Helpers
 //		return null;
 //	}
 //
-//	private class ExternalLoginData
-//	{
-//		public string LoginProvider { get; set; }
-//		public string ProviderKey { get; set; }
-//		public string UserName { get; set; }
-//
-//		public IList<Claim> GetClaims()
-//		{
-//			IList<Claim> claims = new List<Claim>();
-//			claims.Add(new Claim(ClaimTypes.NameIdentifier, ProviderKey, null, LoginProvider));
-//
-//			if (UserName != null)
-//			{
-//				claims.Add(new Claim(ClaimTypes.Name, UserName, null, LoginProvider));
-//			}
-//
-//			return claims;
-//		}
-//
-//		public static ExternalLoginData FromIdentity(ClaimsIdentity identity)
-//		{
-//			if (identity == null)
-//			{
-//				return null;
-//			}
-//
-//			Claim providerKeyClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
-//
-//			if (providerKeyClaim == null || String.IsNullOrEmpty(providerKeyClaim.Issuer)
-//				|| String.IsNullOrEmpty(providerKeyClaim.Value))
-//			{
-//				return null;
-//			}
-//
-//			if (providerKeyClaim.Issuer == ClaimsIdentity.DefaultIssuer)
-//			{
-//				return null;
-//			}
-//
-//			return new ExternalLoginData
-//			{
-//				LoginProvider = providerKeyClaim.Issuer,
-//				ProviderKey = providerKeyClaim.Value,
-//				UserName = identity.FindFirstValue(ClaimTypes.Name)
-//			};
-//		}
-//	}
-//
-//	private static class RandomOAuthStateGenerator
-//	{
-//		private static RandomNumberGenerator _random = new RNGCryptoServiceProvider();
-//
-//		public static string Generate(int strengthInBits)
-//		{
-//			const int bitsPerByte = 8;
-//
-//			if (strengthInBits % bitsPerByte != 0)
-//			{
-//				throw new ArgumentException("strengthInBits must be evenly divisible by 8.", "strengthInBits");
-//			}
-//
-//			int strengthInBytes = strengthInBits / bitsPerByte;
-//
-//			byte[] data = new byte[strengthInBytes];
-//			_random.GetBytes(data);
-//			return HttpServerUtility.UrlTokenEncode(data);
-//		}
-//	}
-//
-//	#endregion
-//}
