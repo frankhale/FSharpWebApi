@@ -138,8 +138,9 @@
     <Compile Include="Models\AccountViewModels.fs" />
     <Compile Include="Models\IdentityModels.fs" />
     <Compile Include="Infrastructure\Infrastructure.fs" />
-    <Compile Include="Providers\ApplicationOAuthProvider.fs" />
-    <Compile Include="Result\ChallengeResult.fs" />
+	<Compile Include="Infrastructure\ApplicationOAuthProvider.fs" />
+    <Compile Include="Infrastructure\ChallengeResult.fs" />
+	<Compile Include="Infrastructure\Startup.fs" />
     <Compile Include="Controllers\HomeController.fs" />
     <Compile Include="Controllers\AccountController.fs" />
     <Compile Include="Controllers\ValuesController.fs" />
@@ -153,7 +154,6 @@
     <Compile Include="Global.asax.fs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Startup.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
