@@ -99,6 +99,9 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
   
   new() = new AccountController()
 
+  member private this.Authentication = 
+    this.Request.GetOwinContext().Authentication
+
   // GET api/Account/UserInfo
   [<HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)>]
   [<Route("UserInfo")>]
@@ -111,14 +114,13 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
     userInfoViewModel
 
   // POST api/Account/Logout
-//  [<Route("Logout")>]
-//  member this.Logout() =
-//    Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType)
-//    Ok()
+  [<Route("Logout")>]
+  member this.Logout() =
+    this.Authentication.SignOut(CookieAuthenticationDefaults.AuthenticationType)
+    this.Ok()
 
-//
-//	// GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
-//	[Route("ManageInfo")]
+  // GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
+//  [Route("ManageInfo")]
 //	public async Task<ManageInfoViewModel> GetManageInfo(string returnUrl, bool generateState = false)
 //	{
 //		IdentityUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
@@ -415,25 +417,15 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
 //		}
 //		return Ok();
 //	}
-//
-//	protected override void Dispose(bool disposing)
-//	{
-//		if (disposing && _userManager != null)
-//		{
-//			_userManager.Dispose();
-//			_userManager = null;
-//		}
-//
-//		base.Dispose(disposing);
-//	}
-//
-//	#region Helpers
-//
-//	private IAuthenticationManager Authentication
-//	{
-//		get { return Request.GetOwinContext().Authentication; }
-//	}
-//
+
+  override this.Dispose(disposing:bool) =
+    if (disposing && _userManager <> null) then
+      _userManager.Dispose()
+      _userManager <- null
+
+    base.Dispose(disposing)
+
+
 //	private IHttpActionResult GetErrorResult(IdentityResult result)
 //	{
 //		if (result == null)
@@ -462,4 +454,3 @@ type AccountController(userManager:ApplicationUserManager, accessTokenFormat:ISe
 //
 //		return null;
 //	}
-//
