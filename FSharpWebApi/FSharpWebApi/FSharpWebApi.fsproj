@@ -114,10 +114,15 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
 	<Content Include="Areas\README.md" />
-	<Compile Include="Areas\HelpPage\ModelDescriptions\IModelDocumentationProvider.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\IModelDocumentationProvider.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\CollectionModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ComplexTypeModelDescription.fs" />
+	<compile Include="Areas\HelpPage\HPModels\HelpPageApiModel.fs" />
 	<Compile Include="Areas\HelpPage\ApiDescriptionExtensions.fs" />
 	<Content Include="Areas\HelpPage\HelpPage.css" />
 	<Compile Include="Areas\HelpPage\HelpPageAreaRegistration.fs" />
+	<Compile Include="Areas\HelpPage\HelpPageConfigurationExtensions.fs" />
 	<Compile Include="Areas\HelpPage\XmlDocumentationProvider.fs" />
     <Content Include="Content\Site.css" />
 	<Content Include="Content\Bootstrap.css" />
