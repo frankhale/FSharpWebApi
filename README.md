@@ -1,12 +1,12 @@
 #FSharpWebApi
 
-A port of the C# ASP.NET Web API project template to F#
+A port of the C# ASP.NET Web API project template to F#. Basically I created a new C# ASP.NET
+Web API project and then took all that code and ported it to F#.
 
 ##Status
 
-Still have to finish up the AccountController and then port the entire Areas 
-folder. I'm gonna plug more at it tomorrow (20 Feb 2015) but it may still be a 
-few days off before finishing.
+Everything is ported except the HelpPage Area. That has been started and should be complete
+soon.
 
 ##License
 
