@@ -113,6 +113,12 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+	<Content Include="Areas\README.md" />
+	<Compile Include="Areas\HelpPage\ModelDescriptions\IModelDocumentationProvider.fs" />
+	<Compile Include="Areas\HelpPage\ApiDescriptionExtensions.fs" />
+	<Content Include="Areas\HelpPage\HelpPage.css" />
+	<Compile Include="Areas\HelpPage\HelpPageAreaRegistration.fs" />
+	<Compile Include="Areas\HelpPage\XmlDocumentationProvider.fs" />
     <Content Include="Content\Site.css" />
 	<Content Include="Content\Bootstrap.css" />
 	<Content Include="Content\Bootstrap.min.css" />
