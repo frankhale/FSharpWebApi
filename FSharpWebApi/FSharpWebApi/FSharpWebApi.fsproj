@@ -120,11 +120,14 @@
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ComplexTypeModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\KeyValuePairModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\DictionaryModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\EnumValueDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\EnumTypeModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\SimpleTypeModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelNameAttribute.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelNameHelper.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ParameterAnnotation.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ParameterDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelDescriptionGenerator.fs" />
 	<compile Include="Areas\HelpPage\HPModels\HelpPageApiModel.fs" />
 	<Compile Include="Areas\HelpPage\ApiDescriptionExtensions.fs" />
 	<Content Include="Areas\HelpPage\HelpPage.css" />
