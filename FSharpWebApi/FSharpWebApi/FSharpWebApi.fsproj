@@ -118,6 +118,13 @@
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\CollectionModelDescription.fs" />
 	<Compile Include="Areas\HelpPage\HPModelDescriptions\ComplexTypeModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\KeyValuePairModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\DictionaryModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\SimpleTypeModelDescription.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelNameAttribute.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ModelNameHelper.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ParameterAnnotation.fs" />
+	<Compile Include="Areas\HelpPage\HPModelDescriptions\ParameterDescription.fs" />
 	<compile Include="Areas\HelpPage\HPModels\HelpPageApiModel.fs" />
 	<Compile Include="Areas\HelpPage\ApiDescriptionExtensions.fs" />
 	<Content Include="Areas\HelpPage\HelpPage.css" />

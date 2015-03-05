@@ -6,4 +6,3 @@ type ComplexTypeModelDescription() =
   inherit ModelDescription()
 
   member val Properties = new Collection<string>() with get 
-
